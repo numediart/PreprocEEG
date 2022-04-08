@@ -1,0 +1,20 @@
+clc;
+clear all;
+tic;
+load('C:\Users\桃子12345\Desktop\toolbox2.0\multichanneldata.mat');
+X = multichanneldata;
+[Y,Imfnumber] = EEMD_mdecompose(X,0.2,100,250,13);
+[numOfcompo ,T] = size(Y);
+mean1=mean(Y,2);%求每行均值
+Y=Y-mean1*ones(1,size(Y,2));%去均值
+
+for i=1:numOfcompo
+entro(i,:) = entropy(Y(i,:));
+end
+  
+%  [Zmeemd,Y_meemd] = choose_compo(imf,0.7);
+%  
+%  [Ymssacca]= CCA_denoise(Zmeemd,0.9,250);
+%  multichannelplot(Zmeemd,250,200);
+%   multichannelplot(Ymssacca,250,200);
+%   multichannelplot(X,250,200);
