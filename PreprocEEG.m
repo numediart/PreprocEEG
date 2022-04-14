@@ -1,26 +1,66 @@
-PATH_TO_EEG_PROCESSING = 'C:\Users\luca-\OneDrive - UMONS\_PhD\_Matlab\EEG Processing'; %Windows
-PATH_TO_ARTIFACT_REMOVAL = 'C:\Users\luca-\OneDrive - UMONS\_PhD\_Matlab\Artifact Reduction'; %artifact_removal function
-PATH_TO_MWF = 'D:\__EOG artifact correction\MWF-artifact-removal'; %Multi-channel Wiener Filter toolbox (remove ocular artifacts)
-PATH_TO_LINE_NOISE = 'C:\Users\luca-\OneDrive - UMONS\_PhD\_Matlab\Artifact Reduction\NoiseTools'; %nt_zapline function to remove line noise
+% Luca La Fisca
+% ------------------------------
+%  Copyright UMONS (C) 2021
+%%
+mfilename = 'PreprocEEG.m';
+cd(fileparts(which(mfilename)))
+addpath(genpath('utils'))
 
-addpath(PATH_TO_EEG_PROCESSING);
-addpath(PATH_TO_ARTIFACT_REMOVAL);
-addpath(genpath(PATH_TO_MWF));
-addpath(genpath(PATH_TO_LINE_NOISE));
+fname = 'config.json';
+fid = fopen(fname);
+raw = fread(fid,inf);
+str = char(raw');
+fclose(fid);
+config = jsondecode(str);
 
 fs = config.fsample;
 fs_down = 512;
 
-for s = 1:n_sess
-    eeg = load(['C:\Users\luca-\OneDrive - UMONS\_PhD\_Matlab\Validation\Validation-Framework-Source-Reconstruction\pseudo_eeg\test_session_' num2str(s) '.mat']);
-    eeg = eeg.(cell2mat(fieldnames(eeg)));
-    load(['C:\Users\luca-\OneDrive - UMONS\_PhD\_Matlab\Validation\Validation-Framework-Source-Reconstruction\pseudo_data\test_artifact_' num2str(s) '.mat']);
-    
-    trial_eeg = eeg;
-    for i = 1:n_trial
-        trial_eeg.time{i} = 0:1/fs:config.pseudo_length-1/fs;
-        trial_eeg.trial{i} = eeg.trial{1}(:,event(s,i):event(s,i)+config.pseudo_length*fs-1);
+ext = ['.' config.datatype];
+
+for s = 1:config.n_sessions
+    if strcmp(ext,'.mat')
+        raw_eeg = load(fullfile(config.eeg_path, [config.eeg_filename num2str(s) ext]));
+        raw_eeg = raw_eeg.(cell2mat(fieldnames(raw_eeg)));
+    else
+        cfg = [];
+        cfg.dataset = fullfile(config.eeg_path, [config.eeg_filename num2str(s) ext]);
+%         cfg.dataset = fullfile('D:\__EEG-data', 'ARC_J_30_07.02.20.am.bdf');
+        raw_eeg = ft_preprocessing(cfg);
     end
+%     eeg = load(['..\Validation\Validation-Framework-Source-Reconstruction\pseudo_eeg\test_session_' num2str(s) '.mat']);
+%     load(['..\Validation\Validation-Framework-Source-Reconstruction\pseudo_data\test_artifact_' num2str(s) '.mat']);
+    if ~isempty(config.artifact_filename)
+        pseudo_artf = load(fullfile(config.artifact_path, [config.artifact_filename num2str(s) '.mat']));
+        pseudo_artf = pseudo_artf.(cell2mat(fieldnames(pseudo_artf)));
+    end
+    
+    % Epoch data in segments of 1s to facilitate the visual rejection
+    cfg = [];
+    cfg.trials = 'all';
+    cfg.length = 1; %epoch the data in segments of 1 sec
+    cfg.overlap = 0;
+    data_trial = ft_redefinetrial(cfg, raw_eeg);
+    
+    % Reject bad channels
+    cfg = [];
+    cfg.method = 'trial';
+    cfg.preproc.dftfilter = 'yes';
+    cfg.preproc.dftreplace = 'neighbour';
+    cfg.preproc.demean = 'yes';
+    cfg.preproc.lpfilter = 'yes';
+    cfg.preproc.lpfreq = 100;
+    tmp = ft_rejectvisual(cfg, data_trial);
+    cfg = [];
+    cfg.channel = tmp.label;
+    raw_eeg = ft_preprocessing(cfg,raw_eeg);
+    
+    % Ocular artifacts rejection
+%     trial_eeg = eeg;
+%     for i = 1:n_trial
+%         trial_eeg.time{i} = 0:1/fs:config.pseudo_length-1/fs;
+%         trial_eeg.trial{i} = eeg.trial{1}(:,event(s,i):event(s,i)+config.pseudo_length*fs-1);
+%     end
     
     % Filtering
     cfg = [];
@@ -31,14 +71,14 @@ for s = 1:n_sess
     cfg.dftreplace = 'neighbour';
     cfg.lpfreq = 200;
     cfg.lpinstabilityfix = 'reduce';
-    preproc_eeg = ft_preprocessing(cfg, eeg);
+    preproc_eeg = ft_preprocessing(cfg, raw_eeg);
     
     % EOG
     eog_channel = {'Fp1', 'Fp2','Fpz'};
     cfg = [];
     cfg.channel    = 'all';
     cfg.reref = 'yes';
-    cfg.refchannel = eeg.label(~ismember(eeg.label,eog_channel));
+    cfg.refchannel = raw_eeg.label(~ismember(raw_eeg.label,eog_channel));
     cfg.detrend = 'yes';
     cfg.bpfilter = 'yes';
     cfg.bpfiltord = 5;
@@ -62,31 +102,50 @@ for s = 1:n_sess
     eog_v = ft_selectdata(cfg,eog);
     
     % remove EOG artifacts
-    check = 0;
-    mask = zeros(1,length(eeg.trial{1}));
-    eyem_idx = find(strcmp(pseudo_artf{1}.type,'eyem'));
-    for i = 1:min([10,length(eyem_idx)])
-        start_idx = pseudo_artf{1}.sample(eyem_idx(i));
-        dur = fs/artf_template.fsample*length(cell2mat(artf_template.artf.eyem(pseudo_artf{1}.index(eyem_idx(i))-length(artf_template.artf.elec))));
-        mask(start_idx:start_idx+dur) = 1;
+    if ~isempty(config.artifact_filename)
+        check = 0;
+        mask = zeros(1,length(raw_eeg.trial{1}));
+        eyem_idx = find(strcmp(pseudo_artf{1}.type,'eyem'));
+        for i = 1:min([10,length(eyem_idx)])
+            start_idx = pseudo_artf{1}.sample(eyem_idx(i));
+            dur = fs/artf_template.fsample*length(cell2mat(artf_template.artf.eyem(pseudo_artf{1}.index(eyem_idx(i))-length(artf_template.artf.elec))));
+            mask(start_idx:start_idx+dur) = 1;
+        end
+        close all;
+        no_blink_eeg = blink_removal(raw_eeg, preproc_eeg, eog_channel, check, fs, mask);
+    else
+        [no_blink_eeg,mask] = blink_removal(raw_eeg, preproc_eeg, eog_channel, check, fs);
     end
-    close all;
-    no_blink_eeg = blink_removal(eeg, preproc_eeg, eog_channel, check, fs, mask);
+        
     
     % Detrending and filtering
+    trial_eeg = raw_eeg;
+    trial_eeg.trial{1} = no_blink_eeg;
     cfg = [];
     cfg.detrend = 'yes';
     cfg.demean = 'yes';
     cfg.lpfilter = 'yes';
     cfg.lpfreq = 200;
     cfg.lpinstabilityfix = 'reduce';
-    trial_eeg = ft_preprocessing(cfg, eeg);
-    trial_eeg.trial{1} = no_blink_eeg;
+    trial_eeg = ft_preprocessing(cfg, trial_eeg);
     
-    trial_eeg = eeg;
-    for i = 1:n_trial
-        trial_eeg.time{i} = 0:1/fs:config.pseudo_length-1/fs;
-        trial_eeg.trial{i} = eeg.trial{1}(:,event(s,i):event(s,i)+config.pseudo_length*fs-1);
+%     trial_eeg = eeg;
+    if ~isempty(config.event)
+        for i = 1:n_trial
+            trial_eeg.time{i} = 0:1/fs:config.pseudo_length-1/fs;
+            trial_eeg.trial{i} = eeg.trial{1}(:,event(s,i):event(s,i)+config.pseudo_length*fs-1);
+        end
+    else
+        eventvalue = str2num(cell2mat(regexp(config.eventvalue,'\d*','Match')'))';
+        cfg = [];
+        cfg.dataset = fullfile(config.eeg_path, [config.eeg_filename num2str(s) ext]);
+%         cfg.dataset = fullfile('D:\__EEG-data', 'ARC_J_30_07.02.20.am.bdf');
+        cfg.trialdef.eventtype  = config.eventtype;
+        cfg.trialdef.eventvalue = eventvalue;
+        cfg.trialdef.prestim    = config.prestim;
+        cfg.trialdef.poststim   = config.poststim;
+        cfg = ft_definetrial(cfg);
+        trial_eeg = ft_redefinetrial(cfg,trial_eeg);
     end
 
     % downsample
@@ -105,7 +164,11 @@ for s = 1:n_sess
         cfg = [];
         cfg.demean = 'yes';
         cfg.detrend = 'yes';
-        cfg.baselinewindow = [0.8 1];
+        if config.prestim > 0.3 %use prestim signal for the correction
+            cfg.baselinewindow = [-config.prestim -0.2];
+        else %if not enough signal before stimulus onset, use late signal
+            cfg.baselinewindow = [config.poststim-0.1*(config.poststim+config.prestim) config.poststim];
+        end
         eeg = ft_preprocessing(cfg, clean_eeg);
     end
 
@@ -115,5 +178,5 @@ for s = 1:n_sess
     cfg.refchannel = 'all'; %average reference = best for source reconstruction
     eeg = ft_preprocessing(cfg,eeg);
     
-    save(['C:\Users\luca-\OneDrive - UMONS\_PhD\_Matlab\Validation\Preproceesed_eeg\test_eeg_processed_' num2str(s) '.mat'], 'eeg')
+    save(fullfile(fileparts(which(mfilename)),'preprocessed_data',['test_eeg_processed_' num2str(s) '.mat']), 'eeg')
 end
