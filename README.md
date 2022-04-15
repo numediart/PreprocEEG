@@ -27,8 +27,7 @@ Edit the config.json file to adapt the framework to your data by following the p
 
 ## Fit BIDS format
 The provided code reads data following the BIDS format (https://bids.neuroimaging.io/index.html).
-Edit your dataset to fit this format (e.g. sub-005_task-example_eeg.bdf).
-Example:
+Edit your dataset to fit this format. Example:
 ```
 /
 ├── dataset_description.json
