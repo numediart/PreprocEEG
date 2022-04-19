@@ -32,6 +32,7 @@ Provide data type and path:
     "comment_datatype" : "bdf, edf or mat",
     "eeg_path"         : "PATH_TO_EEG_FILE",
     "eeg_filename"     : "sub-xxx_task-yyy_eeg",
+    "output_path"      : null,
      
 ```
 Provide event file with required information for the data segmentation:
