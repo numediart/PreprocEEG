@@ -18,20 +18,29 @@ fs_down = 512;
 
 ext = ['.' config.datatype];
 
-for s = 1:config.n_sessions
+if length(config.n_subjects)>1
+    subjects = config.n_subjects;
+else
+    subjects = 1:config.n_subjects;
+end
+
+for s = subjects
+    if s >= 10
+        subj_name = ['sub-0' num2str(s)];
+    else
+        subj_name = ['sub-00' num2str(s)];
+    end
+    EEGfile = fullfile(config.eeg_path, [subj_name '_' config.eeg_filename ext]);
     if strcmp(ext,'.mat')
-        raw_eeg = load(fullfile(config.eeg_path, [config.eeg_filename num2str(s) ext]));
+        raw_eeg = load(EEGfile);
         raw_eeg = raw_eeg.(cell2mat(fieldnames(raw_eeg)));
     else
         cfg = [];
-        cfg.dataset = fullfile(config.eeg_path, [config.eeg_filename num2str(s) ext]);
-%         cfg.dataset = fullfile('D:\__EEG-data', 'ARC_J_30_07.02.20.am.bdf');
+        cfg.dataset = EEGfile;
         raw_eeg = ft_preprocessing(cfg);
     end
-%     eeg = load(['..\Validation\Validation-Framework-Source-Reconstruction\pseudo_eeg\test_session_' num2str(s) '.mat']);
-%     load(['..\Validation\Validation-Framework-Source-Reconstruction\pseudo_data\test_artifact_' num2str(s) '.mat']);
     if ~isempty(config.artifact_filename)
-        pseudo_artf = load(fullfile(config.artifact_path, [config.artifact_filename num2str(s) '.mat']));
+        pseudo_artf = load(fullfile(config.artifact_path, [subj_name '_' config.artifact_filename '.mat']));
         pseudo_artf = pseudo_artf.(cell2mat(fieldnames(pseudo_artf)));
     end
     
@@ -56,12 +65,6 @@ for s = 1:config.n_sessions
     raw_eeg = ft_preprocessing(cfg,raw_eeg);
     
     % Ocular artifacts rejection
-%     trial_eeg = eeg;
-%     for i = 1:n_trial
-%         trial_eeg.time{i} = 0:1/fs:config.pseudo_length-1/fs;
-%         trial_eeg.trial{i} = eeg.trial{1}(:,event(s,i):event(s,i)+config.pseudo_length*fs-1);
-%     end
-    
     % Filtering
     cfg = [];
     cfg.detrend = 'yes';
@@ -129,7 +132,6 @@ for s = 1:config.n_sessions
     cfg.lpinstabilityfix = 'reduce';
     trial_eeg = ft_preprocessing(cfg, trial_eeg);
     
-%     trial_eeg = eeg;
     if ~isempty(config.event)
         for i = 1:n_trial
             trial_eeg.time{i} = 0:1/fs:config.pseudo_length-1/fs;
@@ -138,8 +140,7 @@ for s = 1:config.n_sessions
     else
         eventvalue = str2num(cell2mat(regexp(config.eventvalue,'\d*','Match')'))';
         cfg = [];
-        cfg.dataset = fullfile(config.eeg_path, [config.eeg_filename num2str(s) ext]);
-%         cfg.dataset = fullfile('D:\__EEG-data', 'ARC_J_30_07.02.20.am.bdf');
+        cfg.dataset = EEGfile;
         cfg.trialdef.eventtype  = config.eventtype;
         cfg.trialdef.eventvalue = eventvalue;
         cfg.trialdef.prestim    = config.prestim;
@@ -178,5 +179,5 @@ for s = 1:config.n_sessions
     cfg.refchannel = 'all'; %average reference = best for source reconstruction
     eeg = ft_preprocessing(cfg,eeg);
     
-    save(fullfile(fileparts(which(mfilename)),'preprocessed_data',['test_eeg_processed_' num2str(s) '.mat']), 'eeg')
+    save(fullfile(fileparts(which(mfilename)),'preprocessed_data',[subj_name '_task-test_preprocessed' '.mat']), 'eeg')
 end
