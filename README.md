@@ -58,8 +58,8 @@ If predefined artifacts are used (simulated data), give the path to automaticall
 ```
     "artifact_path"     : "../Validation/Validation-Framework-Source-Reconstruction/pseudo_data",
     "artifact_filename" : "test_artifact_"
-```
  }
+ ```
 
 ## Fit BIDS format
 The provided code reads data following the BIDS format (https://bids.neuroimaging.io/index.html).
