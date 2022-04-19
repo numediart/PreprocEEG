@@ -179,5 +179,9 @@ for s = subjects
     cfg.refchannel = 'all'; %average reference = best for source reconstruction
     eeg = ft_preprocessing(cfg,eeg);
     
-    save(fullfile(fileparts(which(mfilename)),'preprocessed_data',[subj_name '_task-test_preprocessed' '.mat']), 'eeg')
+    if exist(config.output_path)
+        save(fullfile(config.output_path,[subj_name '_task-test_preprocessed' '.mat']),'eeg');
+    else
+        save(fullfile(fileparts(which(mfilename)),'preprocessed_data',[subj_name '_task-test_preprocessed' '.mat']), 'eeg')
+    end
 end
