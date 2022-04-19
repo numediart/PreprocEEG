@@ -36,7 +36,7 @@ Provide data type and path:
 ```
 Provide event file with required information for the data segmentation:
 ```
-    "event"      : "PATH_TO_EVENT_FILE/event.mat",
+    "event"      : "PATH_TO_EVENT_FILE/sub-xxx_task-yyy_event.mat",
     "eventtype"  : "STATUS",
     "eventvalue" : "10, 11, 12",
     "prestim"    : 0.5,
@@ -44,8 +44,8 @@ Provide event file with required information for the data segmentation:
 ```
 Provide general information about the dataset:
 ```
-    "n_sessions"            : 30,
-    "comment_n_sessions"    : "provide either a number (to go from 1 to n_sessions) or a range (e.g., [2:5, 8:15, 20:41])
+    "n_subjects"            : 30,
+    "comment_n_subjects"    : "provide either a number (to go from 1 to n_sessions) or a range (e.g., [2:5, 8:15, 20:41])
     "n_trials"              : 200,
     "fsample"               : 2048,
     "session_duration"      : 15,
@@ -57,7 +57,7 @@ Provide general information about the dataset:
 If predefined artifacts are used (simulated data), give the path to automatically identify useful time segments:
 ```
     "artifact_path"     : "../Validation/Validation-Framework-Source-Reconstruction/pseudo_data",
-    "artifact_filename" : "test_artifact_"
+    "artifact_filename" : "task-test_artifact"
  }
  ```
 
