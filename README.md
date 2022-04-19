@@ -45,7 +45,7 @@ Provide event file with required information for the data segmentation:
 Provide general information about the dataset:
 ```
     "n_subjects"            : 30,
-    "comment_n_subjects"    : "provide either a number (to go from 1 to n_sessions) or a range (e.g., [2:5, 8:15, 20:41])
+    "comment_n_subjects"    : "provide either a number (to go from 1 to n_subjects) or a range (e.g., [2:5, 8:15, 20:41])
     "n_trials"              : 200,
     "fsample"               : 2048,
     "session_duration"      : 15,
