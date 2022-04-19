@@ -25,6 +25,42 @@ cd PreprocEEG
 ## Configure the framework
 Edit the config.json file to adapt the framework to your data by following the provided template.
 
+Provide data type and path:
+```
+{
+    "datatype"				: "bdf",
+    "comment_datatype"		: "bdf, edf or mat",
+    "eeg_path"				: "PATH_TO_EEG_FILE",
+    "eeg_filename"			: "sub-xxx_task-yyy_eeg",
+     
+```
+Provide event file with required information for the data segmentation:
+```
+    "event"					: "PATH_TO_EVENT_FILE/event.mat",
+    "eventtype"				: "STATUS",
+    "eventvalue"			: "10, 11, 12",
+    "prestim"				: 0.5,
+    "poststim"				: 1,
+```
+Provide general information about the dataset:
+```
+    "n_sessions"			: 30,
+    "comment_n_sessions" : "provide either a number (to go from 1 to n_sessions) or a range (e.g., [2:5, 8:15, 20:41])
+    "n_trials" 				: 200,
+    "fsample"				: 2048,
+    "session_duration"		: 15,
+    "comment_session_dur"	: "in minutes",
+    "pseudo_length"			: 1,
+    "comment_pseudo_length" : "in seconds",
+ ```
+
+If predefined artifacts are used (simulated data), give the path to automatically identify useful time segments:
+```
+    "artifact_path"			: "../Validation/Validation-Framework-Source-Reconstruction/pseudo_data",
+    "artifact_filename"		: "test_artifact_"
+```
+ }
+
 ## Fit BIDS format
 The provided code reads data following the BIDS format (https://bids.neuroimaging.io/index.html).
 Edit your dataset to fit this format. Example:
