@@ -60,6 +60,7 @@ If predefined artifacts are used (simulated data), give the path to automaticall
     "artifact_filename" : "task-test_artifact"
  }
  ```
+ Finally, save the modified config.json file.
 
 ## Fit BIDS format
 The provided code reads data following the BIDS format (https://bids.neuroimaging.io/index.html).
@@ -88,3 +89,7 @@ Edit your dataset to fit this format. Example:
 │       ├── sub-02
 │       └── ...
 ```
+
+# Perform the preprocessing
+Open the script in Matlab editor and run it to process your data.
+The resulting preprocessed EEG files will be automatically stored in the "preprocessed_data" folder except if you specified another location as the "output_path" of the config file.
