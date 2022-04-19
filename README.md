@@ -32,6 +32,7 @@ Provide data type and path:
     "comment_datatype" : "bdf, edf or mat",
     "eeg_path"         : "PATH_TO_EEG_FILE",
     "eeg_filename"     : "sub-xxx_task-yyy_eeg",
+    "output_path"      : null,
      
 ```
 Provide event file with required information for the data segmentation:
@@ -45,7 +46,7 @@ Provide event file with required information for the data segmentation:
 Provide general information about the dataset:
 ```
     "n_subjects"            : 30,
-    "comment_n_subjects"    : "provide either a number (to go from 1 to n_sessions) or a range (e.g., [2:5, 8:15, 20:41])
+    "comment_n_subjects"    : "provide either a number (to go from 1 to n_subjects) or a range (e.g., [2:5, 8:15, 20:41])
     "n_trials"              : 200,
     "fsample"               : 2048,
     "session_duration"      : 15,
@@ -60,6 +61,7 @@ If predefined artifacts are used (simulated data), give the path to automaticall
     "artifact_filename" : "task-test_artifact"
  }
  ```
+ Finally, save the modified config.json file.
 
 ## Fit BIDS format
 The provided code reads data following the BIDS format (https://bids.neuroimaging.io/index.html).
@@ -88,3 +90,7 @@ Edit your dataset to fit this format. Example:
 │       ├── sub-02
 │       └── ...
 ```
+
+# Perform the preprocessing
+Open the script in Matlab editor and run it to process your data.
+The resulting preprocessed EEG files will be automatically stored in the "preprocessed_data" folder except if you specified another location as the "output_path" of the config file.
