@@ -1,7 +1,7 @@
 # PreprocEEG
  
 This code is related to the work presented in the EMBC 2022:
-La Fisca and Gosselin, "A Hybrid Framework for ERP Preprocessing in EEG Experiments".
+La Fisca and Gosselin, "A Hybrid Framework for ERP Preprocessing in EEG Experiments", 44th Annual International Conference of the IEEE Engineering in Medicine and Biology Society (EMBC), July 2022.
 
 To cite this work, please contact: luca.lafisa@umons.ac.be
 
