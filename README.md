@@ -3,7 +3,7 @@
 This code is related to the work presented in the EMBC 2022:
 La Fisca and Gosselin, "A Hybrid Framework for ERP Preprocessing in EEG Experiments", 44th Annual International Conference of the IEEE Engineering in Medicine and Biology Society (EMBC), July 2022.
 
-To cite this work, please contact: luca.lafisa@umons.ac.be
+To cite this work, please contact: luca.lafisca@umons.ac.be
 
 ## Description
 This repository aims to preprocess ERP data from an EEG experiment (bdf, edf or mat file) using a hybrid framework that follows recommendations of OHBM COBIDAS MEEG committee.
