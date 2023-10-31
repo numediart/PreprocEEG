@@ -1,9 +1,8 @@
 # PreprocEEG
  
 This code is related to the work presented in the EMBC 2022:
-La Fisca and Gosselin, "A Hybrid Framework for ERP Preprocessing in EEG Experiments", 44th Annual International Conference of the IEEE Engineering in Medicine and Biology Society (EMBC), July 2022.
+[La Fisca and Gosselin, "A Hybrid Framework for ERP Preprocessing in EEG Experiments", 44th Annual International Conference of the IEEE Engineering in Medicine and Biology Society (EMBC), July 2022.](https://hdl.handle.net/20.500.12907/43258)
 
-To cite this work, please contact: luca.lafisca@umons.ac.be
 
 ## Description
 This repository aims to preprocess ERP data from an EEG experiment (bdf, edf or mat file) using a hybrid framework that follows recommendations of OHBM COBIDAS MEEG committee.
@@ -30,41 +29,55 @@ Provide data type and path:
 {
     "datatype"         : "bdf",
     "comment_datatype" : "bdf, edf or mat",
-    "eeg_path"         : "PATH_TO_EEG_FILE",
+    "eeg_path"         : "PATH_TO_EEG_BIDS_FOLDER",
     "eeg_filename"     : "sub-xxx_task-yyy_eeg",
     "output_path"      : null,
      
 ```
 Provide event file with required information for the data segmentation:
 ```
-    "event"      : "PATH_TO_EVENT_FILE/sub-xxx_task-yyy_event.mat",
-    "eventtype"  : "STATUS",
-    "eventvalue" : "10, 11, 12",
-    "prestim"    : 0.5,
-    "poststim"   : 1,
+    "event"         : "PATH_TO_EVENT_FILE/sub-xxx_task-yyy_event.mat",
+    "comment_event" : "replace 'null' by the path of your event file if needed",
+
+    "trial_function"        : "ft_trialfun_general",
+    "comment_trial_function": "replace with the desired trial function (cf. [FieldTrip doc](https://www.fieldtriptoolbox.org/example/making_your_own_trialfun_for_conditional_trial_definition/#:~:text=The%20ft_definetrial%20function%20allows%20you,is%20done%20using%20the%20cfg.))",
+    "eventtype"             : "STATUS",
+    "eventvalue"            : [10, 11, 12],
+    "prestim"               : 0.5,
+    "poststim"              : 1,
 ```
-Provide general information about the dataset:
+Provide general information about the process:
 ```
-    "n_subjects"            : 30,
-    "comment_n_subjects"    : "provide either a number (to go from 1 to n_subjects) or a range (e.g., [2:5, 8:15, 20:41])
-    "n_trials"              : 200,
-    "fsample"               : 2048,
-    "session_duration"      : 15,
-    "comment_session_dur"   : "in minutes",
-    "pseudo_length"         : 1,
-    "comment_pseudo_length" : "in seconds",
+    "save_choice"           : false,
+    "check_steps"           : true,
+    "timelock_analysis"     : true,
+    "check_timelock"        : true,
+```
+
+Define parameter values:
+```
+    "fs"                    : 2048,
+    "fs_down"               : 512,
+    "line_frequency"        : 50,
+    "target_conditions"     : [1,8],
+
+    "lowpass_freq"          : 200,
+
+    "zapline_ncomponent"    : 3,
+
+    "eemd_ensemble_number"  : 100,
+    "eemd_noise_level"      : 0.2,
+    "eemd_mode_number"      : -1,
+    "eemd_treshold"         : 0.9,
+    
+    "cca_threshold"         : 0.5,
+    "cca_time_lag"          : 1
  ```
 
-If predefined artifacts are used (simulated data), give the path to automatically identify useful time segments:
-```
-    "artifact_path"     : "../Validation/Validation-Framework-Source-Reconstruction/pseudo_data",
-    "artifact_filename" : "task-test_artifact"
- }
- ```
  Finally, save the modified config.json file.
 
 ## Fit BIDS format
-The provided code reads data following the BIDS format (https://bids.neuroimaging.io/index.html).
+The provided code reads data following the [BIDS format](https://bids.neuroimaging.io/index.html).
 Edit your dataset to fit this format. Example:
 ```
 /
@@ -72,25 +85,25 @@ Edit your dataset to fit this format. Example:
 ├── participants.tsv
 ├── README
 ├── CHANGES
-├── sub-01
+├── sub-001
 │   └── eeg
-│       ├── sub-01_task-xxx_eeg.bdf
-│       ├── sub-01_task-xxx_eeg.json
-│       └── sub-01_task-xxx_events.tsv
-├── sub-02
+│       ├── sub-001_task-xxx_eeg.bdf
+│       ├── sub-001_task-xxx_eeg.json
+│       └── sub-001_task-xxx_events.tsv
+├── sub-002
 ├── ...
 ├── derivatives
 │   └── preproc_and_segment
 │       ├── dataset_description.json
-│       ├── sub-01
+│       ├── sub-001
 │       │   └── eeg
-│       │       ├── sub-01_preprocessed.mat
-│       │       ├── sub-01_timelock.mat
-│       │       └── sub-01_timelock.json
-│       ├── sub-02
+│       │       ├── sub-001_preprocessed.mat
+│       │       ├── sub-001_timelock.mat
+│       │       └── sub-001_timelock.json
+│       ├── sub-002
 │       └── ...
 ```
 
 # Perform the preprocessing
 Open the script in Matlab editor and run it to process your data.
-The resulting preprocessed EEG files will be automatically stored in the "preprocessed_data" folder except if you specified another location as the "output_path" of the config file.
+The resulting preprocessed EEG files will be automatically stored in the "eeg_path" folder with the name "sub-xxx_task-xxx_eeg.mat" except if you specified another location as the "output_path" of the config file.
