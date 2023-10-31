@@ -42,6 +42,7 @@ Provide event file with required information for the data segmentation:
 
     "trial_function"        : "ft_trialfun_general",
     "comment_trial_function": "replace with the desired trial function (cf. [FieldTrip doc](https://www.fieldtriptoolbox.org/example/making_your_own_trialfun_for_conditional_trial_definition/#:~:text=The%20ft_definetrial%20function%20allows%20you,is%20done%20using%20the%20cfg.))",
+    <a href="https://www.google.com/" target="_blank">Google</a>
     "eventtype"             : "STATUS",
     "eventvalue"            : [10, 11, 12],
     "prestim"               : 0.5,
