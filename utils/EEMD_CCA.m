@@ -1,12 +1,14 @@
-function clean_eeg = EEMD_CCA(data_trial,TARGET_COND,check,fs)
+function clean_eeg = EEMD_CCA(data_trial,config)
 %default values
-NE=100;
-NoiseLevel=0.2;
-% fs=512;
-numImf=-1;
+NE=config.eemd_ensemble_number;
+NoiseLevel=config.eemd_noise_level;
+numImf=config.eemd_mode_number;
 ACthreshold1 = 0.9; %Autocorrelation threshold to select noisy IMFs
 tlag = 1; %time lag for CCA
 ACthreshold2 = 0.5; %Autocorrelation threshold to select artifact components
+fs=config.fs_down;
+TARGET_COND = config.target_conditions(1):config.target_conditions(end);
+check = config.check_steps;
 
 clean_eeg = data_trial;
 
@@ -22,7 +24,7 @@ for i = sel
     X_original = data_trial.trial{i};
     
     % remove power line noise
-    FLINE=50/fs; % line frequency
+    FLINE=config.line_frequency/fs; % line frequency
     NREMOVE=3; % number of components to remove
     [X_original,~] = nt_zapline(X_original,FLINE,NREMOVE);
     

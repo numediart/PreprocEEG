@@ -28,12 +28,13 @@ EEG_no_blink = mwf_process(raw_matrix, mask , delay); %[ clean_EEG , artifact_es
 
 % check = 1;
 while or(check == 1, check == 3) %visual check
-    raw_eeg.trial{1}(good_chan,:) = EEG_no_blink;
+    raw_eeg.trial{1} = EEG_no_blink;
     % Detrending and filtering
     cfg = [];
     cfg.detrend = 'yes';
     cfg.demean = 'yes';
     cfg.dftfilter = 'yes';
+    cfg.dftreplace = 'neighbour';
     cfg.lpfilter = 'yes';
     cfg.lpfreq = 200;
     cfg.lpinstabilityfix = 'reduce';

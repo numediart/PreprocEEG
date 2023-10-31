@@ -4,21 +4,40 @@
 {
 	"datatype"				: "bdf",
 	"comment_datatype"		: "bdf, edf or mat",
-	"eeg_path"				: "../Validation/Validation-Framework-Source-Reconstruction/pseudo_eeg",
-	"eeg_filename"			: "task-test_eeg",
+	"eeg_path"				: "D:/__EEG-data/BIDS_files",
+	"eeg_filename"			: "task-semantic-priming_eeg",
 	"output_path"			: null,
-	"event"					: "../Validation/Validation-Framework-Source-Reconstruction/template/event.mat",
+
+	"event"					: null,
+	"comment_event" 		: "replace 'null' by the path of your event file if needed",
+
+	"trial_function" 		: "SenSem_trialfun_trial",
+	"comment_trial_function": "replace with the desired trial function (cf. FieldTrip doc)",
 	"eventtype"				: "STATUS",
-	"eventvalue"			: "10, 11, 12",
+	"trialdef_eventvalue" 	: [10, 11, 12],
 	"prestim"				: 0.5,
 	"poststim"				: 1,
-	"n_subjects"			: 30,
-	"n_trials" 				: 200,
-	"fsample"				: 2048,
-	"session_duration"		: 15,
-	"comment_session_dur"	: "in minutes",
-	"pseudo_length"			: 1,
-	"comment_pseudo_length" : "in seconds",
-	"artifact_path"			: "../Validation/Validation-Framework-Source-Reconstruction/pseudo_data",
-	"artifact_filename"		: "task-test_artifact"
+
+	"save_choice" 			: false,
+	"check_steps" 			: true,
+	"timelock_analysis" 	: true,
+	"check_timelock" 		: true,
+
+
+	"fs"	 				: 2048,
+	"fs_down" 				: 512,
+	"line_frequency" 		: 50,
+	"target_conditions" 	: [1,8],
+
+	"lowpass_freq" 			: 200,
+
+	"zapline_ncomponent" 	: 3,
+
+	"eemd_ensemble_number" 	: 100,
+	"eemd_noise_level"  	: 0.2,
+	"eemd_mode_number"  	: -1,
+	"eemd_treshold"  		: 0.9,
+	
+	"cca_threshold"  		: 0.5,
+	"cca_time_lag" 			: 1
 }
