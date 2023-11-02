@@ -1,4 +1,4 @@
-function [multi_timelock] = EEG_processing(config_file)
+function [multi_timelock] = PreprocEEG(config_file)
 
 %read config file
 fname = config_file;
